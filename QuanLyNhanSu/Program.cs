@@ -19,6 +19,7 @@ options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoop
 	.AddNewtonsoftJson(option => option.SerializerSettings.ContractResolver = new DefaultContractResolver());
 // Add here
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 var app = builder.Build();
 
