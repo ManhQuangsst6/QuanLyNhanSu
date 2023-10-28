@@ -1,6 +1,6 @@
 ﻿namespace QuanLyNhanSu.Models
 {
-	public class Department
+	public class Position
 	{
 		public string ID { get; set; }
 		public string Name { get; set; }
