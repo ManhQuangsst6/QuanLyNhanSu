@@ -2,7 +2,7 @@
 {
 	public class Employee_Skill
 	{
-		public Guid EmployeeID { get; set; }
-		public Guid SkillID { get; set; }
+		public string EmployeeID { get; set; }
+		public string SkillID { get; set; }
 	}
 }

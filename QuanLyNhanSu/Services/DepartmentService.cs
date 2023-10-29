@@ -29,8 +29,8 @@ namespace QuanLyNhanSu.Services
 				{
 					var department = new Department
 					{
-						Department_Id = result.GetInt32(0),
-						Department_Name = result.GetString(1)
+						//Department_Id = result.GetInt32(0),
+						//Department_Name = result.GetString(1)
 					};
 					departments.Add(department);
 				}
