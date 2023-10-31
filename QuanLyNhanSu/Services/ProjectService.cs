@@ -17,23 +17,67 @@ namespace QuanLyNhanSu.Services
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 			await conn.OpenAsync();
-			using var command1 = new NpgsqlCommand("AddProject", conn)
+			using var command1 = new NpgsqlCommand("add_project", conn)
 			{
 				CommandType = CommandType.StoredProcedure,
 				Parameters =
 						{
-							new NpgsqlParameter("@projectid", NpgsqlDbType.Varchar){ Value = Guid.NewGuid().ToString() },
-							new NpgsqlParameter("@projectname", NpgsqlDbType.Varchar){ Value=project.Name},
-							new NpgsqlParameter("@datestart", NpgsqlDbType.Date){ Value=project.DateStart}
+							new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar){ Value = Guid.NewGuid().ToString() },
+							new NpgsqlParameter("@project_name", NpgsqlDbType.Varchar){ Value=project.Name},
+							new NpgsqlParameter("@start_date", NpgsqlDbType.Date){ Value=DateTime.Now},
+							new NpgsqlParameter("@project_description", NpgsqlDbType.Varchar){ Value=project.Description}
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
 			return project;
 		}
-
-		public Task<Project> DeleteProject(string id)
+		public async Task<Project> UpdateProject(Project project)
 		{
-			throw new NotImplementedException();
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+
+			await conn.OpenAsync();
+			using var command1 = new NpgsqlCommand("update_project", conn)
+			{
+				CommandType = CommandType.StoredProcedure,
+				Parameters =
+						{
+							new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar){ Value = project.ID },
+							new NpgsqlParameter("@project_name", NpgsqlDbType.Varchar){ Value=project.Name},
+							new NpgsqlParameter("@project_description", NpgsqlDbType.Varchar){ Value=project.Description}
+						}
+			};
+			await using var reader = await command1.ExecuteReaderAsync();
+			return project;
+		}
+		public async Task<string> UpdateComplete(string id)
+		{
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+
+			await conn.OpenAsync();
+			using var command1 = new NpgsqlCommand("complete_project", conn)
+			{
+				CommandType = CommandType.StoredProcedure,
+				Parameters =
+						{
+							new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar){ Value =id },
+							new NpgsqlParameter("@end_date", NpgsqlDbType.Date){ Value=DateTime.Now},
+						}
+			};
+			await using var reader = await command1.ExecuteReaderAsync();
+			return id;
+		}
+		public async Task<string> DeleteProject(string id)
+		{
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+			await conn.OpenAsync();
+			using var cmd = new NpgsqlCommand("delete_project", conn);
+			cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+			cmd.Parameters.AddWithValue("project_id", id);
+
+			cmd.ExecuteNonQuery();
+
+			return id;
 		}
 
 		public Task<Employee> GetEmployeeInProject(string id)
@@ -41,36 +85,50 @@ namespace QuanLyNhanSu.Services
 			throw new NotImplementedException();
 		}
 
-		public Task<Project> GetProjectById(string id)
+		public async Task<Project> GetProjectById()
 		{
 			throw new NotImplementedException();
+
 		}
 
-		public async Task<List<Project>> GetProjectsAsync()
+		public async Task<List<Project>> GetProjectsAsync(string? searchName, int? filterDay, int? filterMonth)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+
 			await conn.OpenAsync();
 			var projects = new List<Project>();
-			using (var cmd = new NpgsqlCommand("select * from GetProjects", conn))
+
+			using var cmd = new NpgsqlCommand("SELECT * FROM search_projects(@search_name, @filter_day, @filter_month)", conn)
 			{
-				using (var reader = cmd.ExecuteReader())
+				CommandType = System.Data.CommandType.Text,
+				Parameters =
 				{
-					while (reader.Read())
-					{
-						string? id = reader["ID"].ToString();
-						string? name = reader["Name"].ToString();
-						DateTime dateStart = Convert.ToDateTime(reader["DateStart"]);
-						DateTime? dateEnd = reader["DateEnd"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["DateEnd"]);
-						projects.Add(new Project { ID = id, Name = name, DateStart = dateStart, DateEnd = dateEnd });
-					}
+					new NpgsqlParameter("@search_name", NpgsqlDbType.Varchar) { Value = searchName ?? (object)DBNull.Value },
+					new NpgsqlParameter("@filter_day", NpgsqlDbType.Integer) { Value = filterDay ?? (object)DBNull.Value },
+					new NpgsqlParameter("@filter_month", NpgsqlDbType.Integer) { Value = filterMonth ?? (object)DBNull.Value }
+				}
+
+
+
+			};
+			using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				while (reader.Read())
+				{
+					string? id = reader["project_id"].ToString();
+					string? name = reader["project_name"].ToString();
+					DateTime dateStart = Convert.ToDateTime(reader["project_start_date"]);
+					string? description = reader["project_description"].ToString();
+					DateTime? dateEnd = reader["project_end_date"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["project_end_date"]);
+
+					// Xử lý dữ liệu
+					projects.Add(new Project { ID = id, Name = name, DateStart = dateStart, DateEnd = dateEnd, Description = description });
+
 				}
 			}
 			return projects;
 		}
 
-		public Task<Project> UpdateProject(Project project)
-		{
-			throw new NotImplementedException();
-		}
+
 	}
 }
