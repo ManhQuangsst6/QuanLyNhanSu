@@ -16,7 +16,6 @@ namespace QuanLyNhanSu.Services
 		public async Task<Project> AddProject(Project project)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
-
 			await conn.OpenAsync();
 			using var command1 = new NpgsqlCommand("AddProject", conn)
 			{
@@ -50,7 +49,6 @@ namespace QuanLyNhanSu.Services
 		public async Task<List<Project>> GetProjectsAsync()
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
-
 			await conn.OpenAsync();
 			var projects = new List<Project>();
 			using (var cmd = new NpgsqlCommand("select * from GetProjects", conn))
@@ -62,12 +60,8 @@ namespace QuanLyNhanSu.Services
 						string? id = reader["ID"].ToString();
 						string? name = reader["Name"].ToString();
 						DateTime dateStart = Convert.ToDateTime(reader["DateStart"]);
-
 						DateTime? dateEnd = reader["DateEnd"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["DateEnd"]);
-
-						// Xử lý dữ liệu
 						projects.Add(new Project { ID = id, Name = name, DateStart = dateStart, DateEnd = dateEnd });
-
 					}
 				}
 			}
