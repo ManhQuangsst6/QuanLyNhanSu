@@ -9,7 +9,7 @@ namespace QuanLyNhanSu.Interfaces
 		Task<Project> UpdateProject(Project project);
 		Task<string> UpdateComplete(string id);
 		Task<string> DeleteProject(string id);
-		Task<Project> GetProjectById();
+		Task<Project> GetProjectById(string id);
 		Task<Employee> GetEmployeeInProject(string id);
 	}
 }

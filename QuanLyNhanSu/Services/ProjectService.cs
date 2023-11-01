@@ -85,9 +85,33 @@ namespace QuanLyNhanSu.Services
 			throw new NotImplementedException();
 		}
 
-		public async Task<Project> GetProjectById()
+		public async Task<Project> GetProjectById(string projectID)
 		{
-			throw new NotImplementedException();
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+
+			await conn.OpenAsync();
+
+			using var cmd = new NpgsqlCommand("SELECT * FROM GetProjectInfo(@p_ProjectID)", conn)
+			{
+				CommandType = System.Data.CommandType.Text,
+				Parameters =
+				{
+					new NpgsqlParameter("@p_ProjectID", NpgsqlDbType.Varchar) { Value = projectID },
+				}
+
+			};
+			using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				reader.Read();
+
+				string? name = reader["ProjectName"].ToString();
+				DateTime dateStart = Convert.ToDateTime(reader["ProjectDateStart"]);
+				string? description = reader["ProjectDescription"].ToString();
+				DateTime? dateEnd = reader["ProjectDateEnd"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["ProjectDateEnd"]);
+
+				var res = new Project() { ID = null, Name = name, DateStart = dateStart, DateEnd = dateEnd, Description = description };
+				return res;
+			}
 
 		}
 
