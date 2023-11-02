@@ -20,6 +20,7 @@ options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoop
 // Add here
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IEmployee_ProjectService, Employee_ProjectService>();
 
 var app = builder.Build();
 
