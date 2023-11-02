@@ -26,13 +26,65 @@ namespace QuanLyNhanSu.Controllers
 				return NotFound(ex.Message);
 			}
 		}
-
-		[HttpGet]
-		public async Task<IActionResult> GetProjectsAsync()
+		[HttpPut]
+		public async Task<IActionResult> UpdateProject(Project project)
 		{
 			try
 			{
-				var res = await _projectService.GetProjectsAsync();
+				var res = await _projectService.UpdateProject(project);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+		[HttpPut]
+		public async Task<IActionResult> UpdateComplete(string id)
+		{
+			try
+			{
+				var res = await _projectService.UpdateComplete(id);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+		[HttpDelete]
+		public async Task<IActionResult> DeleteProject(string id)
+		{
+			try
+			{
+				var res = await _projectService.DeleteProject(id);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetProjectsAsync(string? searchName, int? filterDay, int? filterMonth)
+		{
+			try
+			{
+				var res = await _projectService.GetProjectsAsync(searchName, filterDay, filterMonth);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+		[HttpGet]
+		public async Task<IActionResult> GetProjectById(string id)
+		{
+			try
+			{
+				var res = await _projectService.GetProjectById(id);
 				return Ok(res);
 			}
 			catch (Exception ex)

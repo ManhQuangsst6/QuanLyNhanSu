@@ -1,6 +1,4 @@
 ﻿using Npgsql;
-using Microsoft.AspNetCore.Mvc;
-
 using NpgsqlTypes;
 using QuanLyNhanSu.Interfaces;
 using QuanLyNhanSu.Models;
@@ -18,7 +16,6 @@ namespace QuanLyNhanSu.Services
 		public async Task<Project> AddProject(Project project)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
-
 			await conn.OpenAsync();
 			using var command1 = new NpgsqlCommand("add_project", conn)
 			{
@@ -27,7 +24,7 @@ namespace QuanLyNhanSu.Services
 						{
 							new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar){ Value = Guid.NewGuid().ToString() },
 							new NpgsqlParameter("@project_name", NpgsqlDbType.Varchar){ Value=project.Name},
-							new NpgsqlParameter("@start_date", NpgsqlDbType.Date){ Value=project.DateStart},
+							new NpgsqlParameter("@start_date", NpgsqlDbType.Date){ Value=DateTime.Now},
 							new NpgsqlParameter("@project_description", NpgsqlDbType.Varchar){ Value=project.Description}
 						}
 			};
@@ -44,7 +41,7 @@ namespace QuanLyNhanSu.Services
 				CommandType = CommandType.StoredProcedure,
 				Parameters =
 						{
-							new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar){ Value = Guid.NewGuid().ToString() },
+							new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar){ Value = project.ID },
 							new NpgsqlParameter("@project_name", NpgsqlDbType.Varchar){ Value=project.Name},
 							new NpgsqlParameter("@project_description", NpgsqlDbType.Varchar){ Value=project.Description}
 						}
@@ -52,7 +49,7 @@ namespace QuanLyNhanSu.Services
 			await using var reader = await command1.ExecuteReaderAsync();
 			return project;
 		}
-		public async Task<Project> UpdateComplete(Project project)
+		public async Task<string> UpdateComplete(string id)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
@@ -62,12 +59,12 @@ namespace QuanLyNhanSu.Services
 				CommandType = CommandType.StoredProcedure,
 				Parameters =
 						{
-							new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar){ Value = Guid.NewGuid().ToString() },
-							new NpgsqlParameter("@end_date", NpgsqlDbType.Date){ Value=project.DateStart},
+							new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar){ Value =id },
+							new NpgsqlParameter("@end_date", NpgsqlDbType.Date){ Value=DateTime.Now},
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
-			return project;
+			return id;
 		}
 		public async Task<string> DeleteProject(string id)
 		{
@@ -88,61 +85,69 @@ namespace QuanLyNhanSu.Services
 			throw new NotImplementedException();
 		}
 
-		public async Task<Project> GetProjectById(string searchName, int? filterDay, int? filterMonth)
+		public async Task<Project> GetProjectById(string projectID)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
 			await conn.OpenAsync();
-			var projects = new Project();
-			using (var cmd = new NpgsqlCommand("search_projects", conn))
+
+			using var cmd = new NpgsqlCommand("SELECT * FROM GetProjectInfo(@p_ProjectID)", conn)
 			{
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
-				cmd.Parameters.AddWithValue("search_name", searchName ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("filter_day", filterDay ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("filter_month", filterMonth ?? (object)DBNull.Value);
-
-				using (var reader = await cmd.ExecuteReaderAsync())
+				CommandType = System.Data.CommandType.Text,
+				Parameters =
 				{
-					while (reader.Read())
-					{
-						string? id = reader["ID"].ToString();
-						string? name = reader["Name"].ToString();
-						DateTime dateStart = Convert.ToDateTime(reader["DateStart"]);
-
-						DateTime? dateEnd = reader["DateEnd"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["DateEnd"]);
-
-						// Xử lý dữ liệu
-						projects = new Project { ID = id, Name = name, DateStart = dateStart, DateEnd = dateEnd };
-
-					}
+					new NpgsqlParameter("@p_ProjectID", NpgsqlDbType.Varchar) { Value = projectID },
 				}
+
+			};
+			using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				reader.Read();
+
+				string? name = reader["ProjectName"].ToString();
+				DateTime dateStart = Convert.ToDateTime(reader["ProjectDateStart"]);
+				string? description = reader["ProjectDescription"].ToString();
+				DateTime? dateEnd = reader["ProjectDateEnd"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["ProjectDateEnd"]);
+
+				var res = new Project() { ID = null, Name = name, DateStart = dateStart, DateEnd = dateEnd, Description = description };
+				return res;
 			}
-			return projects;
+
 		}
 
-		public async Task<List<Project>> GetProjectsAsync()
+		public async Task<List<Project>> GetProjectsAsync(string? searchName, int? filterDay, int? filterMonth)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
 			await conn.OpenAsync();
 			var projects = new List<Project>();
-			using (var cmd = new NpgsqlCommand("select * from GetProjects", conn))
+
+			using var cmd = new NpgsqlCommand("SELECT * FROM search_projects(@search_name, @filter_day, @filter_month)", conn)
 			{
-				using (var reader = cmd.ExecuteReader())
+				CommandType = System.Data.CommandType.Text,
+				Parameters =
 				{
-					while (reader.Read())
-					{
-						string? id = reader["ID"].ToString();
-						string? name = reader["Name"].ToString();
-						DateTime dateStart = Convert.ToDateTime(reader["DateStart"]);
+					new NpgsqlParameter("@search_name", NpgsqlDbType.Varchar) { Value = searchName ?? (object)DBNull.Value },
+					new NpgsqlParameter("@filter_day", NpgsqlDbType.Integer) { Value = filterDay ?? (object)DBNull.Value },
+					new NpgsqlParameter("@filter_month", NpgsqlDbType.Integer) { Value = filterMonth ?? (object)DBNull.Value }
+				}
 
-						DateTime? dateEnd = reader["DateEnd"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["DateEnd"]);
 
-						// Xử lý dữ liệu
-						projects.Add(new Project { ID = id, Name = name, DateStart = dateStart, DateEnd = dateEnd });
 
-					}
+			};
+			using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				while (reader.Read())
+				{
+					string? id = reader["project_id"].ToString();
+					string? name = reader["project_name"].ToString();
+					DateTime dateStart = Convert.ToDateTime(reader["project_start_date"]);
+					string? description = reader["project_description"].ToString();
+					DateTime? dateEnd = reader["project_end_date"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["project_end_date"]);
+
+					// Xử lý dữ liệu
+					projects.Add(new Project { ID = id, Name = name, DateStart = dateStart, DateEnd = dateEnd, Description = description });
+
 				}
 			}
 			return projects;
