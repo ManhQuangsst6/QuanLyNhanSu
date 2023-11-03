@@ -2,7 +2,7 @@
 {
 	public class EmployeeView
 	{
-		public int Id { get; set; }
+		public string Id { get; set; }
 		public string? Employeecode { get; set; }
 		public string? Name { get; set; }
 		public string? Department { get; set; }
