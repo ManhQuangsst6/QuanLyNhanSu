@@ -85,12 +85,12 @@ namespace QuanLyNhanSu.Services
 
 
 
-        public async Task<List<EmployeeView>> GetEmployeeViews(string? name, string? departmentID, string? positionID, string? projectID, int? pageNum, int? pageSize)
+        public async Task<List<EmployeeView>> GetEmployeeViews(string? name, string? departmentID, string? positionID, string? projectID, string? skillID, int? pageNum, int? pageSize)
         {
             await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
             await conn.OpenAsync();
             var employeeviews = new List<EmployeeView>();
-            using var cmd = new NpgsqlCommand("SELECT * FROM GetFilteredEmployees(@search_name, @department_id, @position_id, @project_id, @page_num, @page_size)", conn)
+            using var cmd = new NpgsqlCommand("SELECT * FROM GetFilteredEmployees(@search_name, @department_id, @position_id, @project_id, @skill_id, @page_num, @page_size)", conn)
             {
                 CommandType = System.Data.CommandType.Text,
                 Parameters =
@@ -99,6 +99,7 @@ namespace QuanLyNhanSu.Services
                     new NpgsqlParameter("@department_id", NpgsqlDbType.Varchar) { Value = departmentID ?? (object)DBNull.Value },
                     new NpgsqlParameter("@position_id", NpgsqlDbType.Varchar) { Value = positionID ?? (object)DBNull.Value },
                     new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar) { Value = projectID ?? (object)DBNull.Value },
+                    new NpgsqlParameter("@skill_id", NpgsqlDbType.Varchar) { Value = skillID ?? (object)DBNull.Value },
                     new NpgsqlParameter("@page_num", NpgsqlDbType.Integer) { Value = pageNum != null ? pageNum : 1},
                     new NpgsqlParameter("@page_size", NpgsqlDbType.Integer) { Value = pageSize != null ? pageSize: 10}
                 }
@@ -117,7 +118,6 @@ namespace QuanLyNhanSu.Services
 
                     // Xử lý dữ liệu
                     employeeviews.Add(new EmployeeView { Id = Id, Employeecode = Employeecode, Name = Name, Department = Department, Position = Position, Project = Project, Salary = Salary});
-
                 }
             }
             return employeeviews;

@@ -60,11 +60,11 @@ namespace QuanLyNhanSu.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployeeViews(string? name, string? departmentID, string? positionID, string? projectID, int? pageNum, int? pageSize)
+        public async Task<IActionResult> GetEmployeeViews(string? name, string? departmentID, string? positionID, string? projectID, string? skillID, int? pageNum, int? pageSize)
         {
             try
             {
-                var res = await _employeeService.GetEmployeeViews(name, departmentID, positionID, projectID, pageNum, pageSize);
+                var res = await _employeeService.GetEmployeeViews(name, departmentID, positionID, projectID, skillID, pageNum, pageSize);
                 return Ok(res);
             }
             catch (Exception ex)
