@@ -95,13 +95,13 @@ namespace QuanLyNhanSu.Services
                 CommandType = System.Data.CommandType.Text,
                 Parameters =
                 {
-                    new NpgsqlParameter("@search_name", NpgsqlDbType.Varchar) { Value = name ?? (object)DBNull.Value },
-                    new NpgsqlParameter("@department_id", NpgsqlDbType.Varchar) { Value = departmentID ?? (object)DBNull.Value },
-                    new NpgsqlParameter("@position_id", NpgsqlDbType.Varchar) { Value = positionID ?? (object)DBNull.Value },
-                    new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar) { Value = projectID ?? (object)DBNull.Value },
-                    new NpgsqlParameter("@skill_id", NpgsqlDbType.Varchar) { Value = skillID ?? (object)DBNull.Value },
-                    new NpgsqlParameter("@page_num", NpgsqlDbType.Integer) { Value = pageNum != null ? pageNum : 1},
-                    new NpgsqlParameter("@page_size", NpgsqlDbType.Integer) { Value = pageSize != null ? pageSize: 10}
+                    new NpgsqlParameter("@search_name", NpgsqlDbType.Varchar) { Value = string.IsNullOrEmpty(name) ? "" : name },
+                    new NpgsqlParameter("@department_id", NpgsqlDbType.Varchar) { Value = string.IsNullOrEmpty(departmentID) ? "" : departmentID },
+                    new NpgsqlParameter("@position_id", NpgsqlDbType.Varchar) { Value = string.IsNullOrEmpty(positionID) ? "" : positionID },
+                    new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar) { Value = string.IsNullOrEmpty(projectID) ? "" : projectID },
+                    new NpgsqlParameter("@skill_id", NpgsqlDbType.Varchar) { Value = string.IsNullOrEmpty(skillID) ? "" : skillID },
+                    new NpgsqlParameter("@page_num", NpgsqlDbType.Integer) { Value = pageNum},
+                    new NpgsqlParameter("@page_size", NpgsqlDbType.Integer) { Value = pageSize}
                 }
             };
             using (var reader = await cmd.ExecuteReaderAsync())
