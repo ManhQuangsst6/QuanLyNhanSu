@@ -86,7 +86,7 @@ namespace QuanLyNhanSu.Controllers
 			}
 		}
 		[HttpPut]
-		public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, string salaryAmount)
+		public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount)
 		{
 			try
 			{
