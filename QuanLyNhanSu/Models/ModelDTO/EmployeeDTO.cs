@@ -15,5 +15,10 @@
 		public string? UserID { set; get; }
 		public string? Avatar { set; get; }
 		public string? UseName { set; get; }
+		public List<string>? SkillList { set; get; }
+		public string? SalaryID { set; get; }
+		public double? SalaryAmount { set; get; }
+		public DateTime? SalaryStartDate { set; get; }
+
 	}
 }
