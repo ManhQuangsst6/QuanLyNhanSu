@@ -20,44 +20,107 @@ namespace QuanLyNhanSu.Services
         {
             await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
             await conn.OpenAsync();
-            using var command = new NpgsqlCommand("add_project", conn)
+            using var command = new NpgsqlCommand("AddEmployee", conn)
             {
                 CommandType = CommandType.StoredProcedure,
 				Parameters =
                     {
-                        new NpgsqlParameter("@p_EmployeeID", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
-						new NpgsqlParameter("@p_EmployeeCode", NpgsqlDbType.Varchar) { Value = employeeDTO.Code },
-						new NpgsqlParameter("@p_FullName", NpgsqlDbType.Varchar) { Value = employeeDTO.Name },
-						new NpgsqlParameter("@p_BirthDate", NpgsqlDbType.Date) { Value = employeeDTO.BirthDate },
-                        new NpgsqlParameter("@p_Address", NpgsqlDbType.Varchar) { Value = employeeDTO.Address },
-                        new NpgsqlParameter("@p_PhoneNumber", NpgsqlDbType.Varchar) { Value = employeeDTO.PhoneNumber },
-                        new NpgsqlParameter("@p_Email", NpgsqlDbType.Varchar) { Value = employeeDTO.Email },
-                        new NpgsqlParameter("@p_DepartmentID", NpgsqlDbType.Varchar) { Value = employeeDTO.DepartmentID },
-                        new NpgsqlParameter("@p_PositionID", NpgsqlDbType.Varchar) { Value = employeeDTO.PositionID },
-                        new NpgsqlParameter("@p_DateStart", NpgsqlDbType.Date) { Value = DateTime.Now },
-                        new NpgsqlParameter("@p_Gender", NpgsqlDbType.Integer) { Value = employeeDTO.Gender },
-                        new NpgsqlParameter("@p_UserID", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
-                        new NpgsqlParameter("@p_Avatar", NpgsqlDbType.Varchar) { Value = employeeDTO.Avatar },
-                        new NpgsqlParameter("@p_UserName", NpgsqlDbType.Varchar) { Value = employeeDTO.UseName }
+                        new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
+						new NpgsqlParameter("@p_employeecode", NpgsqlDbType.Varchar) { Value = employeeDTO.Code },
+						new NpgsqlParameter("@p_fullname", NpgsqlDbType.Varchar) { Value = employeeDTO.Name },
+						new NpgsqlParameter("@p_birthdate", NpgsqlDbType.Date) { Value = employeeDTO.BirthDate },
+                        new NpgsqlParameter("@p_address", NpgsqlDbType.Varchar) { Value = employeeDTO.Address },
+                        new NpgsqlParameter("@p_phonenumber", NpgsqlDbType.Varchar) { Value = employeeDTO.PhoneNumber },
+                        new NpgsqlParameter("@p_email", NpgsqlDbType.Varchar) { Value = employeeDTO.Email },
+                        new NpgsqlParameter("@p_departmentid", NpgsqlDbType.Varchar) { Value = employeeDTO.DepartmentID },
+                        new NpgsqlParameter("@p_positionid", NpgsqlDbType.Varchar) { Value = employeeDTO.PositionID },
+                        new NpgsqlParameter("@p_datestart", NpgsqlDbType.Date) { Value = DateTime.Now },
+                        new NpgsqlParameter("@p_gender", NpgsqlDbType.Integer) { Value = employeeDTO.Gender },
+                        new NpgsqlParameter("@p_userid", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
+                        new NpgsqlParameter("@p_avatar", NpgsqlDbType.Varchar) { Value = employeeDTO.Avatar },
+                        new NpgsqlParameter("@p_username", NpgsqlDbType.Varchar) { Value = employeeDTO.UseName }
                     }
             };
             await using var reader = await command.ExecuteReaderAsync();
             return employeeDTO;
         }
 
-        public Task<string> DeleteEmployee(string employeeId)
+        public async Task<string> DeleteEmployee(string employeeId)
         {
-            throw new NotImplementedException();
+            await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+            await conn.OpenAsync();
+            using var command = new NpgsqlCommand("DeleteEmployee", conn)
+            {
+                CommandType = CommandType.StoredProcedure,
+                Parameters =
+                    {
+                        new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar) { Value = employeeId }
+                    }
+            };
+            await using var reader = await command.ExecuteReaderAsync();
+            return employeeId;
         }
 
-        public Task<string> DeleteMultiEmployee(List<string> employeeId)
+        public async Task<string> DeleteMultiEmployee(List<string> employeeId)
         {
-            throw new NotImplementedException();
+            if (employeeId == null || employeeId.Count == 0)
+            {
+                return "No EmployeeIDs provided for deletion.";
+            }
+
+            await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+            await conn.OpenAsync();
+
+            using var command = new NpgsqlCommand("DeleteEmployees", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            command.Parameters.AddWithValue("p_employeeids", employeeId.ToArray());
+
+            await command.ExecuteNonQueryAsync();
+
+            return "Employee(s) deleted successfully.";
         }
 
-        public Task<List<EmployeeView>> GetEmployeeViews(string name, string departmentID, string positionID, string projectID)
+
+
+        public async Task<List<EmployeeView>> GetEmployeeViews(string? name, string? departmentID, string? positionID, string? projectID, int? pageNum, int? pageSize)
         {
-            throw new NotImplementedException();
+            await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+            await conn.OpenAsync();
+            var employeeviews = new List<EmployeeView>();
+            using var cmd = new NpgsqlCommand("SELECT * FROM GetFilteredEmployees(@search_name, @department_id, @position_id, @project_id, @page_num, @page_size)", conn)
+            {
+                CommandType = System.Data.CommandType.Text,
+                Parameters =
+                {
+                    new NpgsqlParameter("@search_name", NpgsqlDbType.Varchar) { Value = name ?? (object)DBNull.Value },
+                    new NpgsqlParameter("@department_id", NpgsqlDbType.Varchar) { Value = departmentID ?? (object)DBNull.Value },
+                    new NpgsqlParameter("@position_id", NpgsqlDbType.Varchar) { Value = positionID ?? (object)DBNull.Value },
+                    new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar) { Value = projectID ?? (object)DBNull.Value },
+                    new NpgsqlParameter("@page_num", NpgsqlDbType.Integer) { Value = pageNum != null ? pageNum : 1},
+                    new NpgsqlParameter("@page_size", NpgsqlDbType.Integer) { Value = pageSize != null ? pageSize: 10}
+                }
+            };
+            using (var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (reader.Read())
+                {
+                    string? Id = reader["id"].ToString();
+                    string? Employeecode = reader["employeecode"].ToString();
+                    string? Name = reader["hoten"].ToString();
+                    string? Department = reader["phongban"].ToString();
+                    string? Position = reader["vitri"].ToString();
+                    string? Project = reader["duan"].ToString();
+                    string? Salary = reader["mucluong"].ToString();
+
+                    // Xử lý dữ liệu
+                    employeeviews.Add(new EmployeeView { Id = Id, Employeecode = Employeecode, Name = Name, Department = Department, Position = Position, Project = Project, Salary = Salary});
+
+                }
+            }
+            return employeeviews;
         }
 
         public Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO)

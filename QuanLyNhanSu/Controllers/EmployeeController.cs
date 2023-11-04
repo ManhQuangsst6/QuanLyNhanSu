@@ -30,5 +30,47 @@ namespace QuanLyNhanSu.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteEmployee(string employeeId)
+        {
+            try
+            {
+                var res = await _employeeService.DeleteEmployee(employeeId);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMultipleEmployees(List<string> employeeIds)
+        {
+            try
+            {
+                var res = await _employeeService.DeleteMultiEmployee(employeeIds);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeViews(string? name, string? departmentID, string? positionID, string? projectID, int? pageNum, int? pageSize)
+        {
+            try
+            {
+                var res = await _employeeService.GetEmployeeViews(name, departmentID, positionID, projectID, pageNum, pageSize);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }
