@@ -8,7 +8,7 @@ namespace QuanLyNhanSu.Interfaces
 		Task<string> UpdateSalaryEmployee(string employeeId);
 		Task<string> UpdateProjectEmployee(string employeeId);
 		Task<string> DeleteMultiEmployee(List<string> employeeId);
-		Task<List<EmployeeView>> GetEmployeeViews(string name, string departmentID, string positionID, string projectID);
+		Task<List<EmployeeView>> GetEmployeeViews(string? name, string? departmentID, string? positionID, string? projectID, string? skillID, int? pageNum, int? pageSize);
 		Task<EmployeeDTO> AddEmployee(EmployeeDTO employeeDTO);
 		Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO);
 	}
