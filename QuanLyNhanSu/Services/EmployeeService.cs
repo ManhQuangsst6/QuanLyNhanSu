@@ -38,7 +38,11 @@ namespace QuanLyNhanSu.Services
                         new NpgsqlParameter("@p_gender", NpgsqlDbType.Integer) { Value = employeeDTO.Gender },
                         new NpgsqlParameter("@p_userid", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
                         new NpgsqlParameter("@p_avatar", NpgsqlDbType.Varchar) { Value = employeeDTO.Avatar },
-                        new NpgsqlParameter("@p_username", NpgsqlDbType.Varchar) { Value = employeeDTO.UseName }
+                        new NpgsqlParameter("@p_username", NpgsqlDbType.Varchar) { Value = employeeDTO.UseName },
+                        new NpgsqlParameter("@p_skills", NpgsqlDbType.Array | NpgsqlDbType.Text) { Value = employeeDTO.SkillList },
+                        new NpgsqlParameter("@p_salaryid", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
+                        new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Numeric) { Value = employeeDTO.SalaryAmount },
+                        new NpgsqlParameter("@p_salarystartdate", NpgsqlDbType.Date) { Value = employeeDTO.SalaryStartDate },
                     }
             };
             await using var reader = await command.ExecuteReaderAsync();
