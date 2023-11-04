@@ -67,11 +67,11 @@ namespace QuanLyNhanSu.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> GetProjectsAsync(string? searchName, int? filterDay, int? filterMonth)
+		public async Task<IActionResult> GetProjectsAsync(string? searchName, int? filterMonth, int? filterYear, int? pageNum, int? pageSize)
 		{
 			try
 			{
-				var res = await _projectService.GetProjectsAsync(searchName, filterDay, filterMonth);
+				var res = await _projectService.GetProjectsAsync(searchName, filterMonth, filterYear, pageNum, pageSize);
 				return Ok(res);
 			}
 			catch (Exception ex)

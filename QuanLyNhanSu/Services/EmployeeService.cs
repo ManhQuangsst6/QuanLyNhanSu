@@ -142,15 +142,15 @@ namespace QuanLyNhanSu.Services
 				CommandType = CommandType.StoredProcedure,
 				Parameters =
 						{
-							new NpgsqlParameter("@p_EmployeeID", NpgsqlDbType.Varchar){ Value = employeeId },
-							new NpgsqlParameter("@p_ProjectID", NpgsqlDbType.Varchar){ Value= projectId}
+							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
+							new NpgsqlParameter("@p_projectid", NpgsqlDbType.Varchar){ Value= projectId}
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
 			return employeeId;
 		}
 
-        public async Task<string> UpdateSalaryEmployee(string employeeId, string salaryAmount)
+        public async Task<string> UpdateSalaryEmployee(string employeeId, double salaryAmount)
         {
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
@@ -160,8 +160,8 @@ namespace QuanLyNhanSu.Services
 				CommandType = CommandType.StoredProcedure,
 				Parameters =
 						{
-							new NpgsqlParameter("@p_EmployeeID", NpgsqlDbType.Varchar){ Value = employeeId },
-							new NpgsqlParameter("@p_SalaryAmount", NpgsqlDbType.Varchar){ Value= salaryAmount}
+							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
+							new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Numeric){ Value= salaryAmount}
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
