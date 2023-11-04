@@ -128,14 +128,40 @@ namespace QuanLyNhanSu.Services
             throw new NotImplementedException();
         }
 
-        public Task<string> UpdateProjectEmployee(string employeeId)
+        public async Task<string> UpdateProjectEmployee(string employeeId, string projectId)
         {
-            throw new NotImplementedException();
-        }
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
-        public Task<string> UpdateSalaryEmployee(string employeeId)
+			await conn.OpenAsync();
+			using var command1 = new NpgsqlCommand("EmployeeJoinProject", conn)
+			{
+				CommandType = CommandType.StoredProcedure,
+				Parameters =
+						{
+							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
+							new NpgsqlParameter("@p_projectid", NpgsqlDbType.Varchar){ Value= projectId}
+						}
+			};
+			await using var reader = await command1.ExecuteReaderAsync();
+			return employeeId;
+		}
+
+        public async Task<string> UpdateSalaryEmployee(string employeeId, double salaryAmount)
         {
-            throw new NotImplementedException();
-        }
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+
+			await conn.OpenAsync();
+			using var command1 = new NpgsqlCommand("UpdateSalary", conn)
+			{
+				CommandType = CommandType.StoredProcedure,
+				Parameters =
+						{
+							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
+							new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Numeric){ Value= salaryAmount}
+						}
+			};
+			await using var reader = await command1.ExecuteReaderAsync();
+			return employeeId;
+		}
     }
 }

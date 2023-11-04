@@ -115,25 +115,24 @@ namespace QuanLyNhanSu.Services
 
 		}
 
-		public async Task<List<Project>> GetProjectsAsync(string? searchName, int? filterDay, int? filterMonth)
+		public async Task<List<Project>> GetProjectsAsync(string? searchName, int? filterMonth, int? filterYear, int? pageNum, int? pageSize)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
 			await conn.OpenAsync();
 			var projects = new List<Project>();
 
-			using var cmd = new NpgsqlCommand("SELECT * FROM search_projects(@search_name, @filter_day, @filter_month)", conn)
+			using var cmd = new NpgsqlCommand("SELECT * FROM search_projects(@search_name, @filter_month, @filter_year, @page_number, @page_size)", conn)
 			{
 				CommandType = System.Data.CommandType.Text,
 				Parameters =
 				{
 					new NpgsqlParameter("@search_name", NpgsqlDbType.Varchar) { Value = searchName ?? (object)DBNull.Value },
-					new NpgsqlParameter("@filter_day", NpgsqlDbType.Integer) { Value = filterDay ?? (object)DBNull.Value },
-					new NpgsqlParameter("@filter_month", NpgsqlDbType.Integer) { Value = filterMonth ?? (object)DBNull.Value }
+					new NpgsqlParameter("@filter_month", NpgsqlDbType.Integer) { Value = filterMonth ?? (object)DBNull.Value },
+					new NpgsqlParameter("@filter_year", NpgsqlDbType.Integer) { Value = filterYear ?? (object)DBNull.Value },
+					new NpgsqlParameter("@page_number", NpgsqlDbType.Integer) { Value = pageNum ?? (object)DBNull.Value },
+					new NpgsqlParameter("@page_size", NpgsqlDbType.Integer) { Value = pageSize ?? (object)DBNull.Value }
 				}
-
-
-
 			};
 			using (var reader = await cmd.ExecuteReaderAsync())
 			{

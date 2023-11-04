@@ -72,5 +72,31 @@ namespace QuanLyNhanSu.Controllers
                 return NotFound(ex.Message);
             }
         }
-    }
+		[HttpPut]
+		public async Task<IActionResult> UpdateProjectEmployee(string employeeId, string projectId)
+		{
+			try
+			{
+				var res = await _employeeService.UpdateProjectEmployee(employeeId, projectId);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+		[HttpPut]
+		public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount)
+		{
+			try
+			{
+				var res = await _employeeService.UpdateSalaryEmployee(employeeId, salaryAmount);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+	}
 }

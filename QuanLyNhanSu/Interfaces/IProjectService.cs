@@ -4,7 +4,7 @@ namespace QuanLyNhanSu.Interfaces
 {
 	public interface IProjectService
 	{
-		Task<List<Project>> GetProjectsAsync(string? searchName, int? filterDay, int? filterMonth);
+		Task<List<Project>> GetProjectsAsync(string? searchName, int? filterMonth, int? filterYear, int? pageNum, int? pageSize );
 		Task<Project> AddProject(Project project);
 		Task<Project> UpdateProject(Project project);
 		Task<string> UpdateComplete(string id);
