@@ -138,8 +138,8 @@ namespace QuanLyNhanSu.Services
 				CommandType = CommandType.StoredProcedure,
 				Parameters =
 						{
-							new NpgsqlParameter("@p_EmployeeID", NpgsqlDbType.Varchar){ Value = employeeId },
-							new NpgsqlParameter("@p_ProjectID", NpgsqlDbType.Varchar){ Value= projectId}
+							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
+							new NpgsqlParameter("@p_projectid", NpgsqlDbType.Varchar){ Value= projectId}
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
@@ -156,8 +156,8 @@ namespace QuanLyNhanSu.Services
 				CommandType = CommandType.StoredProcedure,
 				Parameters =
 						{
-							new NpgsqlParameter("@p_EmployeeID", NpgsqlDbType.Varchar){ Value = employeeId },
-							new NpgsqlParameter("@p_SalaryAmount", NpgsqlDbType.Varchar){ Value= salaryAmount}
+							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
+							new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Varchar){ Value= salaryAmount}
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
