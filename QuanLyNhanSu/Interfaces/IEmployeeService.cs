@@ -15,6 +15,6 @@ namespace QuanLyNhanSu.Interfaces
 		Task<List<EmployeeInProjectView>> GetEmployeeInProjectView(string projectId);
 		Task<int> CountEmployeesInProject(string projectId);
 		Task<int> CountEmployeesInAnyProject();
-		Task<EmployeeViewProc> GetEmployeeByID(string employeeId);
+		Task<List<EmployeeViewProc>> GetEmployeeByID(string employeeId);
 	}
 }
