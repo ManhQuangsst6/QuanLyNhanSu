@@ -70,6 +70,7 @@ namespace QuanLyNhanSu.Controllers
 			}
 		}
 		[HttpPut]
+
 		public async Task<IActionResult> UpdateProjectEmployee(string employeeId, string projectId, DateTime startDate)
 		{
 			try
@@ -83,11 +84,69 @@ namespace QuanLyNhanSu.Controllers
 			}
 		}
 		[HttpPut]
-		public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount, DateTime startDate)
+
+			public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount, DateTime startDate)
 		{
 			try
 			{
 				var res = await _employeeService.UpdateSalaryEmployee(employeeId, salaryAmount, startDate);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> UpdateEmployee(EmployeeDTO employeeDTO)
+		{
+			try
+			{
+				var res = await _employeeService.UpdateEmployee(employeeDTO);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetEmployeeInProjectView(string projectId)
+		{
+			try
+			{
+				var res = await _employeeService.GetEmployeeInProjectView(projectId);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> CountEmployeesInProject(string projectId)
+		{
+			try
+			{
+				var res = await _employeeService.CountEmployeesInProject(projectId);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> CountEmployeesInAnyProject()
+		{
+			try
+			{
+				var res = await _employeeService.CountEmployeesInAnyProject();
+
 				return Ok(res);
 			}
 			catch (Exception ex)

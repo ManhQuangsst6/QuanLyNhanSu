@@ -36,11 +36,11 @@ namespace QuanLyNhanSu.Services
 						new NpgsqlParameter("@p_gender", NpgsqlDbType.Integer) { Value = employeeDTO.Gender },
 						new NpgsqlParameter("@p_userid", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
 						new NpgsqlParameter("@p_avatar", NpgsqlDbType.Varchar) { Value = employeeDTO.Avatar },
-						new NpgsqlParameter("@p_username", NpgsqlDbType.Varchar) { Value = employeeDTO.UseName },
+						new NpgsqlParameter("@p_username", NpgsqlDbType.Varchar) { Value = employeeDTO.UserName },
 						new NpgsqlParameter("@p_skills", NpgsqlDbType.Array | NpgsqlDbType.Text) { Value = employeeDTO.SkillList },
 						new NpgsqlParameter("@p_salaryid", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
 						new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Numeric) { Value = employeeDTO.SalaryAmount },
-						new NpgsqlParameter("@p_salarystartdate", NpgsqlDbType.Date) { Value = employeeDTO.SalaryStartDate },
+						new NpgsqlParameter("@p_salarystartdate", NpgsqlDbType.Date) { Value = employeeDTO.DateStart },
 					}
 			};
 			await using var reader = await command.ExecuteReaderAsync();
@@ -124,11 +124,39 @@ namespace QuanLyNhanSu.Services
 			}
 			return employeeviews;
 		}
-
-		public Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO)
+	public async Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO)
 		{
-			throw new NotImplementedException();
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+			await conn.OpenAsync();
+			using var command = new NpgsqlCommand("UpdateEmployee", conn)
+			{
+				CommandType = CommandType.StoredProcedure,
+				Parameters =
+				{
+					new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar) { Value = employeeDTO.Id },
+					new NpgsqlParameter("@p_employeecode", NpgsqlDbType.Varchar) { Value = employeeDTO.Code },
+					new NpgsqlParameter("@p_fullname", NpgsqlDbType.Varchar) { Value = employeeDTO.Name },
+					new NpgsqlParameter("@p_birthdate", NpgsqlDbType.Date) { Value = employeeDTO.BirthDate },
+					new NpgsqlParameter("@p_address", NpgsqlDbType.Varchar) { Value = employeeDTO.Address },
+					new NpgsqlParameter("@p_phonenumber", NpgsqlDbType.Varchar) { Value = employeeDTO.PhoneNumber },
+					new NpgsqlParameter("@p_email", NpgsqlDbType.Varchar) { Value = employeeDTO.Email },
+					new NpgsqlParameter("@p_departmentid", NpgsqlDbType.Varchar) { Value = employeeDTO.DepartmentID },
+					new NpgsqlParameter("@p_positionid", NpgsqlDbType.Varchar) { Value = employeeDTO.PositionID },
+					new NpgsqlParameter("@p_datestart", NpgsqlDbType.Date) { Value = employeeDTO.DateStart },
+					new NpgsqlParameter("@p_gender", NpgsqlDbType.Integer) { Value = employeeDTO.Gender },
+                    //new NpgsqlParameter("@p_userid", NpgsqlDbType.Varchar) { Value = employeeDTO.UserID },
+                    new NpgsqlParameter("@p_avatar", NpgsqlDbType.Varchar) { Value = employeeDTO.Avatar },
+                    //new NpgsqlParameter("@p_username", NpgsqlDbType.Varchar) { Value = employeeDTO.UserName },
+                    new NpgsqlParameter("@p_skills", NpgsqlDbType.Array | NpgsqlDbType.Text) { Value = employeeDTO.SkillList },
+                    //new NpgsqlParameter("@p_salaryid", NpgsqlDbType.Varchar) { Value = employeeDTO.SalaryID },
+                    new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Numeric) { Value = employeeDTO.SalaryAmount },
+				}
+			};
+			await using var reader = await command.ExecuteReaderAsync();
+			return employeeDTO;
 		}
+
+
 
 		public async Task<string> UpdateProjectEmployee(string employeeId, string projectId, DateTime startDate)
 		{
@@ -142,14 +170,17 @@ namespace QuanLyNhanSu.Services
 						{
 							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
 							new NpgsqlParameter("@p_projectid", NpgsqlDbType.Varchar){ Value= projectId},
-							new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
+              	new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
+
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
 			return employeeId;
 		}
 
+
 		public async Task<string> UpdateSalaryEmployee(string employeeId, double salaryAmount, DateTime startDate)
+
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
@@ -163,10 +194,86 @@ namespace QuanLyNhanSu.Services
 							new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Numeric){ Value= salaryAmount},
 							new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
 
+
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
 			return employeeId;
 		}
+
+
+		public async Task<List<EmployeeInProjectView>> GetEmployeeInProjectView(string projectId)
+		{
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+			await conn.OpenAsync();
+			var employeeviews = new List<EmployeeInProjectView>();
+			using var cmd = new NpgsqlCommand("SELECT * FROM getEmployeesInProject(@project_id)", conn)
+			{
+				CommandType = System.Data.CommandType.Text,
+				Parameters =
+				{
+					new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar) { Value = projectId },
+				}
+			};
+			using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				while (reader.Read())
+				{
+					string? Id = reader["id"].ToString();
+					string? EmployeeCode = reader["employeeCode"].ToString();
+					string? FullName = reader["fullName"].ToString();
+					DateTime DateStart = Convert.ToDateTime(reader["dateStart"]);
+
+					// Xử lý dữ liệu
+					employeeviews.Add(new EmployeeInProjectView { Id = Id, EmployeeCode = EmployeeCode, FullName = FullName, DateStart = DateStart });
+				}
+			}
+			return employeeviews;
+		}
+
+		public async Task<int> CountEmployeesInProject(string projectId)
+		{
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+			await conn.OpenAsync();
+			int count = 0;
+			using var cmd = new NpgsqlCommand("SELECT CountEmployeesInProject(@project_id)", conn)
+			{
+				CommandType = System.Data.CommandType.Text,
+				Parameters =
+				{
+					new NpgsqlParameter("@project_id", NpgsqlDbType.Varchar) { Value = projectId },
+				}
+			};
+			using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				while (reader.Read())
+				{
+					int employee_count = Convert.ToInt32(reader["countemployeesinproject"]);
+					count = employee_count;
+				}
+			}
+			return count;
+		}
+
+		public async Task<int> CountEmployeesInAnyProject()
+		{
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+			await conn.OpenAsync();
+			int count = 0;
+			using var cmd = new NpgsqlCommand("SELECT CountEmployeesInAnyProject()", conn)
+			{
+				CommandType = System.Data.CommandType.Text,
+			};
+			using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				while (reader.Read())
+				{
+					int employee_count = Convert.ToInt32(reader["countemployeesinanyproject"]);
+					count = employee_count;
+				}
+			}
+			return count;
+		}
+
 	}
 }
