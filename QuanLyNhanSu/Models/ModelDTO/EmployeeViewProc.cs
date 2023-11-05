@@ -8,8 +8,9 @@
 		public string? Address { set; get; }
 		public string? PhoneNumber { set; get; }
 		public string? Email { set; get; }
-		public string? DepartmentName { set; get; }
-		public string? PositionName { set; get; }
+		public string? DepartmentID { set; get; }
+		public string? PositionID { set; get; }
+		public string? SkillID { set; get; }
 		public DateTime? DateStart { get; set; }
 		public int? Gender { set; get; }
 		public string? ProjectName { set; get; }

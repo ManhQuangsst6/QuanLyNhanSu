@@ -278,18 +278,19 @@ namespace QuanLyNhanSu.Services
 			}
 			return count;
 		}
-		public async Task<EmployeeViewProc> GetEmployeeByID(string employeeId)
+		public async Task<List<EmployeeViewProc>> GetEmployeeByID(string employeeId)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
 			await conn.OpenAsync();
+			var empls = new List<EmployeeViewProc>();
 
-			using var cmd = new NpgsqlCommand("SELECT * FROM GetEmployeeInfo(@p_employeeid)", conn)
+			using var cmd = new NpgsqlCommand("SELECT * FROM GetEmployeeInfo(@employee_id)", conn)
 			{
 				CommandType = System.Data.CommandType.Text,
 				Parameters =
 				{
-					new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar) { Value = employeeId },
+					new NpgsqlParameter("@employee_id", NpgsqlDbType.Varchar) { Value = employeeId },
 				}
 
 			};
@@ -303,8 +304,9 @@ namespace QuanLyNhanSu.Services
 				string? address = reader["Address"].ToString();
 				string? phonenum = reader["PhoneNumber"].ToString();
 				string? email = reader["Email"].ToString();
-				string? depname = reader["DepartmentName"].ToString();
-				string? posiname = reader["PositionName"].ToString();
+				string? depid = reader["DepartmentID"].ToString();
+				string? posiid = reader["PositionID"].ToString();
+				string? skillid = reader["PositionID"].ToString();
 				DateTime? datestart = Convert.ToDateTime(reader["DateStart"]);
 				int? gender = Convert.ToInt32(reader["Gender"]);
 				string? projectname = reader["ProjectName"].ToString();
@@ -313,8 +315,8 @@ namespace QuanLyNhanSu.Services
 				double? moneybonus = Convert.ToDouble(reader["MoneyBonus"]);
 				double? salaryamount = Convert.ToDouble(reader["SalaryAmount"]);
 
-				var res = new EmployeeViewProc() { Code = code, Name = name, BirthDate = birthdate, Address = address, PhoneNumber = phonenum, Email = email, DepartmentName = depname, PositionName = posiname, DateStart = datestart, Gender = gender, ProjectName = projectname, ProjectStart = projectstart, ProjectEnd = projectend, MoneyBonus = moneybonus, SalaryAmount = salaryamount };
-				return res;
+				empls.Add(new EmployeeViewProc { Code = code, Name = name, BirthDate = birthdate, Address = address, PhoneNumber = phonenum, Email = email, DepartmentID = depid, PositionID = posiid, SkillID = skillid, DateStart = datestart, Gender = gender, ProjectName = projectname, ProjectStart = projectstart, ProjectEnd = projectend, MoneyBonus = moneybonus, SalaryAmount = salaryamount });
+				return empls;
 			}
 
 		}
