@@ -124,8 +124,7 @@ namespace QuanLyNhanSu.Services
 			}
 			return employeeviews;
 		}
-
-		public async Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO)
+	public async Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 			await conn.OpenAsync();
@@ -158,7 +157,8 @@ namespace QuanLyNhanSu.Services
 		}
 
 
-		public async Task<string> UpdateProjectEmployee(string employeeId, string projectId, string startDate)
+
+		public async Task<string> UpdateProjectEmployee(string employeeId, string projectId, DateTime startDate)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
@@ -170,15 +170,17 @@ namespace QuanLyNhanSu.Services
 						{
 							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
 							new NpgsqlParameter("@p_projectid", NpgsqlDbType.Varchar){ Value= projectId},
+              	new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
 
-								new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
 			return employeeId;
 		}
 
-		public async Task<string> UpdateSalaryEmployee(string employeeId, double salaryAmount, string startDate)
+
+		public async Task<string> UpdateSalaryEmployee(string employeeId, double salaryAmount, DateTime startDate)
+
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
@@ -190,12 +192,15 @@ namespace QuanLyNhanSu.Services
 						{
 							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
 							new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Numeric){ Value= salaryAmount},
-								new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
+							new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
+
+
 						}
 			};
 			await using var reader = await command1.ExecuteReaderAsync();
 			return employeeId;
 		}
+
 
 		public async Task<List<EmployeeInProjectView>> GetEmployeeInProjectView(string projectId)
 		{
@@ -269,5 +274,6 @@ namespace QuanLyNhanSu.Services
 			}
 			return count;
 		}
+
 	}
 }

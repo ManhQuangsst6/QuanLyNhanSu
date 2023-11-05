@@ -70,7 +70,8 @@ namespace QuanLyNhanSu.Controllers
 			}
 		}
 		[HttpPut]
-		public async Task<IActionResult> UpdateProjectEmployee(string employeeId, string projectId, string startDate)
+
+		public async Task<IActionResult> UpdateProjectEmployee(string employeeId, string projectId, DateTime startDate)
 		{
 			try
 			{
@@ -83,7 +84,8 @@ namespace QuanLyNhanSu.Controllers
 			}
 		}
 		[HttpPut]
-		public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount, string startDate)
+
+			public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount, DateTime startDate)
 		{
 			try
 			{
@@ -144,6 +146,7 @@ namespace QuanLyNhanSu.Controllers
 			try
 			{
 				var res = await _employeeService.CountEmployeesInAnyProject();
+
 				return Ok(res);
 			}
 			catch (Exception ex)
