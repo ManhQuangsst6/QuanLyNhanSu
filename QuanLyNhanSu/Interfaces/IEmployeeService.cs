@@ -12,5 +12,7 @@ namespace QuanLyNhanSu.Interfaces
         Task<EmployeeDTO> AddEmployee(EmployeeDTO employeeDTO);
         Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO);
         Task<List<EmployeeInProjectView>> GetEmployeeInProjectView(string projectId);
+        Task<int> CountEmployeesInProject(string projectId);
+        Task<int> CountEmployeesInAnyProject();
     }
 }

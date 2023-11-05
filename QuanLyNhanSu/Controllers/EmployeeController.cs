@@ -126,5 +126,33 @@ namespace QuanLyNhanSu.Controllers
                 return NotFound(ex.Message);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CountEmployeesInProject(string projectId)
+        {
+            try
+            {
+                var res = await _employeeService.CountEmployeesInProject(projectId);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CountEmployeesInAnyProject()
+        {
+            try
+            {
+                var res = await _employeeService.CountEmployeesInAnyProject();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }
