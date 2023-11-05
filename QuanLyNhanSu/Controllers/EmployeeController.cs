@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuanLyNhanSu.Interfaces;
 using QuanLyNhanSu.Models.ModelDTO;
+using QuanLyNhanSu.Services;
 
 namespace QuanLyNhanSu.Controllers
 {
@@ -147,6 +148,19 @@ namespace QuanLyNhanSu.Controllers
 			{
 				var res = await _employeeService.CountEmployeesInAnyProject();
 
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
+		[HttpGet]
+		public async Task<IActionResult> GetEmployeeByID(string employeeId)
+		{
+			try
+			{
+				var res = await _employeeService.GetEmployeeByID(employeeId);
 				return Ok(res);
 			}
 			catch (Exception ex)
