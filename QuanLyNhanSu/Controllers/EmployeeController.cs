@@ -72,31 +72,59 @@ namespace QuanLyNhanSu.Controllers
                 return NotFound(ex.Message);
             }
         }
-		[HttpPut]
-		public async Task<IActionResult> UpdateProjectEmployee(string employeeId, string projectId)
-		{
-			try
-			{
-				var res = await _employeeService.UpdateProjectEmployee(employeeId, projectId);
-				return Ok(res);
-			}
-			catch (Exception ex)
-			{
-				return NotFound(ex.Message);
-			}
-		}
-		[HttpPut]
-		public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount)
-		{
-			try
-			{
-				var res = await _employeeService.UpdateSalaryEmployee(employeeId, salaryAmount);
-				return Ok(res);
-			}
-			catch (Exception ex)
-			{
-				return NotFound(ex.Message);
-			}
-		}
-	}
+        [HttpPut]
+        public async Task<IActionResult> UpdateProjectEmployee(string employeeId, string projectId)
+        {
+            try
+            {
+                var res = await _employeeService.UpdateProjectEmployee(employeeId, projectId);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpPut]
+        public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount)
+        {
+            try
+            {
+                var res = await _employeeService.UpdateSalaryEmployee(employeeId, salaryAmount);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmployee(EmployeeDTO employeeDTO)
+        {
+            try
+            {
+                var res = await _employeeService.UpdateEmployee(employeeDTO);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeInProjectView(string projectId)
+        {
+            try
+            {
+                var res = await _employeeService.GetEmployeeInProjectView(projectId);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+    }
 }
