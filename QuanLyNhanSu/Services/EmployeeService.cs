@@ -2,8 +2,12 @@
 using Npgsql;
 using NpgsqlTypes;
 using QuanLyNhanSu.Interfaces;
+using QuanLyNhanSu.Models;
 using QuanLyNhanSu.Models.ModelDTO;
 using System.Data;
+using System.Net;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace QuanLyNhanSu.Services
 {
@@ -274,6 +278,45 @@ namespace QuanLyNhanSu.Services
 			}
 			return count;
 		}
+		public async Task<EmployeeViewProc> GetEmployeeByID(string employeeId)
+		{
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 
+			await conn.OpenAsync();
+
+			using var cmd = new NpgsqlCommand("SELECT * FROM GetEmployeeInfo(@p_employeeid)", conn)
+			{
+				CommandType = System.Data.CommandType.Text,
+				Parameters =
+				{
+					new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar) { Value = employeeId },
+				}
+
+			};
+			using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				reader.Read();
+
+				string? code = reader["EmployeeCode"].ToString();
+				string? name = reader["FullName"].ToString();
+				DateTime birthdate = Convert.ToDateTime(reader["BirthDate"]);
+				string? address = reader["Address"].ToString();
+				string? phonenum = reader["PhoneNumber"].ToString();
+				string? email = reader["Email"].ToString();
+				string? depname = reader["DepartmentName"].ToString();
+				string? posiname = reader["PositionName"].ToString();
+				DateTime? datestart = Convert.ToDateTime(reader["DateStart"]);
+				int? gender = Convert.ToInt32(reader["Gender"]);
+				string? projectname = reader["ProjectName"].ToString();
+				DateTime? projectstart = Convert.ToDateTime(reader["ProjectStart"]);
+				DateTime? projectend = reader["ProjectEnd"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["ProjectEnd"]);
+				double? moneybonus = Convert.ToDouble(reader["MoneyBonus"]);
+				double? salaryamount = Convert.ToDouble(reader["SalaryAmount"]);
+
+				var res = new EmployeeViewProc() { Code = code, Name = name, BirthDate = birthdate, Address = address, PhoneNumber = phonenum, Email = email, DepartmentName = depname, PositionName = posiname, DateStart = datestart, Gender = gender, ProjectName = projectname, ProjectStart = projectstart, ProjectEnd = projectend, MoneyBonus = moneybonus, SalaryAmount = salaryamount };
+				return res;
+			}
+
+		}
 	}
 }
