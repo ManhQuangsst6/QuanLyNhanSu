@@ -40,7 +40,7 @@ namespace QuanLyNhanSu.Services
 						new NpgsqlParameter("@p_skills", NpgsqlDbType.Array | NpgsqlDbType.Text) { Value = employeeDTO.SkillList },
 						new NpgsqlParameter("@p_salaryid", NpgsqlDbType.Varchar) { Value = Guid.NewGuid().ToString() },
 						new NpgsqlParameter("@p_salaryamount", NpgsqlDbType.Numeric) { Value = employeeDTO.SalaryAmount },
-						new NpgsqlParameter("@p_salarystartdate", NpgsqlDbType.Date) { Value = employeeDTO.SalaryStartDate },
+						new NpgsqlParameter("@p_salarystartdate", NpgsqlDbType.Date) { Value = employeeDTO.DateStart },
 					}
 			};
 			await using var reader = await command.ExecuteReaderAsync();
