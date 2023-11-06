@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuanLyNhanSu.Interfaces;
 using QuanLyNhanSu.Models.ModelDTO;
-using QuanLyNhanSu.Services;
 
 namespace QuanLyNhanSu.Controllers
 {
@@ -86,7 +85,7 @@ namespace QuanLyNhanSu.Controllers
 		}
 		[HttpPut]
 
-			public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount, DateTime startDate)
+		public async Task<IActionResult> UpdateSalaryEmployee(string employeeId, double salaryAmount, DateTime startDate)
 		{
 			try
 			{
@@ -168,5 +167,19 @@ namespace QuanLyNhanSu.Controllers
 				return NotFound(ex.Message);
 			}
 		}
+		[HttpGet]
+		public async Task<IActionResult> GetEmployeeOBJ(string employeeId)
+		{
+			try
+			{
+				var res = await _employeeService.GetEmployeeOBJ(employeeId);
+				return Ok(res);
+			}
+			catch (Exception ex)
+			{
+				return NotFound(ex.Message);
+			}
+		}
 	}
+
 }

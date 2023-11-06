@@ -1,4 +1,5 @@
 ﻿
+using Newtonsoft.Json.Linq;
 using Npgsql;
 using NpgsqlTypes;
 using QuanLyNhanSu.Interfaces;
@@ -281,14 +282,13 @@ namespace QuanLyNhanSu.Services
 			await conn.OpenAsync();
 			var empls = new List<EmployeeViewProc>();
 
-			using var cmd = new NpgsqlCommand("SELECT * FROM GetEmployeeInfo(@employee_id)", conn)
+			using var cmd = new NpgsqlCommand("SELECT * FROM GetEmployeeInfoSub(@employee_id)", conn)
 			{
 				CommandType = System.Data.CommandType.Text,
 				Parameters =
 				{
 					new NpgsqlParameter("@employee_id", NpgsqlDbType.Varchar) { Value = employeeId },
 				}
-
 			};
 			using (var reader = await cmd.ExecuteReaderAsync())
 			{
@@ -328,6 +328,28 @@ namespace QuanLyNhanSu.Services
 				return empls;
 			}
 
+		}
+
+		public async Task<JObject> GetEmployeeOBJ(string employeeId)
+		{
+			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
+
+			await conn.OpenAsync();
+			var empls = new List<EmployeeViewProc>();
+
+			using var cmd = new NpgsqlCommand("SELECT get_employee_info(@employee_id)", conn)
+			{
+				CommandType = System.Data.CommandType.Text,
+				Parameters =
+				{
+					new NpgsqlParameter("@employee_id", NpgsqlDbType.Varchar) { Value = employeeId },
+				}
+
+			};
+			var result = await cmd.ExecuteScalarAsync();
+			//var result = command.ExecuteScalar();
+			JObject employeeInfo = JObject.Parse(result.ToString());
+			return employeeInfo;
 		}
 	}
 }

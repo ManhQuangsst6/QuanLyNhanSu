@@ -1,4 +1,5 @@
-﻿using QuanLyNhanSu.Models.ModelDTO;
+﻿using Newtonsoft.Json.Linq;
+using QuanLyNhanSu.Models.ModelDTO;
 
 namespace QuanLyNhanSu.Interfaces
 {
@@ -16,5 +17,9 @@ namespace QuanLyNhanSu.Interfaces
 		Task<int> CountEmployeesInProject(string projectId);
 		Task<int> CountEmployeesInAnyProject();
 		Task<List<EmployeeViewProc>> GetEmployeeByID(string employeeId);
+
+		Task<JObject> GetEmployeeOBJ(string employeeId);
+
+
 	}
 }
