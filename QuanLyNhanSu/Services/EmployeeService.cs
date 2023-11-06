@@ -2,12 +2,8 @@
 using Npgsql;
 using NpgsqlTypes;
 using QuanLyNhanSu.Interfaces;
-using QuanLyNhanSu.Models;
 using QuanLyNhanSu.Models.ModelDTO;
 using System.Data;
-using System.Net;
-using System.Reflection;
-using System.Xml.Linq;
 
 namespace QuanLyNhanSu.Services
 {
@@ -128,7 +124,7 @@ namespace QuanLyNhanSu.Services
 			}
 			return employeeviews;
 		}
-	public async Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO)
+		public async Task<EmployeeDTO> UpdateEmployee(EmployeeDTO employeeDTO)
 		{
 			await using var conn = new NpgsqlConnection(_configuration.GetConnectionString("EmployeeAppCon"));
 			await conn.OpenAsync();
@@ -149,7 +145,7 @@ namespace QuanLyNhanSu.Services
 					new NpgsqlParameter("@p_datestart", NpgsqlDbType.Date) { Value = employeeDTO.DateStart },
 					new NpgsqlParameter("@p_gender", NpgsqlDbType.Integer) { Value = employeeDTO.Gender },
                     //new NpgsqlParameter("@p_userid", NpgsqlDbType.Varchar) { Value = employeeDTO.UserID },
-                    new NpgsqlParameter("@p_avatar", NpgsqlDbType.Varchar) { Value = employeeDTO.Avatar },
+                    new NpgsqlParameter("@p_avatar", NpgsqlDbType.Varchar) { Value = "" },
                     //new NpgsqlParameter("@p_username", NpgsqlDbType.Varchar) { Value = employeeDTO.UserName },
                     new NpgsqlParameter("@p_skills", NpgsqlDbType.Array | NpgsqlDbType.Text) { Value = employeeDTO.SkillList },
                     //new NpgsqlParameter("@p_salaryid", NpgsqlDbType.Varchar) { Value = employeeDTO.SalaryID },
@@ -174,7 +170,7 @@ namespace QuanLyNhanSu.Services
 						{
 							new NpgsqlParameter("@p_employeeid", NpgsqlDbType.Varchar){ Value = employeeId },
 							new NpgsqlParameter("@p_projectid", NpgsqlDbType.Varchar){ Value= projectId},
-              	new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
+				  new NpgsqlParameter("@p_date", NpgsqlDbType.Date){ Value= startDate}
 
 						}
 			};
@@ -296,26 +292,39 @@ namespace QuanLyNhanSu.Services
 			};
 			using (var reader = await cmd.ExecuteReaderAsync())
 			{
-				reader.Read();
+				while (reader.Read())
+				{
+					string? id = reader["ID"].ToString();
+					string? code = reader["EmployeeCode"].ToString();
+					string? name = reader["FullName"].ToString();
+					DateTime birthdate = Convert.ToDateTime(reader["BirthDate"]);
+					string? address = reader["Address"].ToString();
+					string? phonenum = reader["PhoneNumber"].ToString();
+					string? email = reader["Email"].ToString();
+					string? depid = reader["DepartmentID"].ToString();
+					string? posiid = reader["PositionID"].ToString();
+					string? skillid = reader["SkillID"].ToString();
+					DateTime? datestart = Convert.ToDateTime(reader["DateStart"]);
+					int? gender = Convert.ToInt32(reader["Gender"]);
+					double? salaryamount = Convert.ToDouble(reader["SalaryAmount"]);
 
-				string? code = reader["EmployeeCode"].ToString();
-				string? name = reader["FullName"].ToString();
-				DateTime birthdate = Convert.ToDateTime(reader["BirthDate"]);
-				string? address = reader["Address"].ToString();
-				string? phonenum = reader["PhoneNumber"].ToString();
-				string? email = reader["Email"].ToString();
-				string? depid = reader["DepartmentID"].ToString();
-				string? posiid = reader["PositionID"].ToString();
-				string? skillid = reader["PositionID"].ToString();
-				DateTime? datestart = Convert.ToDateTime(reader["DateStart"]);
-				int? gender = Convert.ToInt32(reader["Gender"]);
-				string? projectname = reader["ProjectName"].ToString();
-				DateTime? projectstart = Convert.ToDateTime(reader["ProjectStart"]);
-				DateTime? projectend = reader["ProjectEnd"] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader["ProjectEnd"]);
-				double? moneybonus = Convert.ToDouble(reader["MoneyBonus"]);
-				double? salaryamount = Convert.ToDouble(reader["SalaryAmount"]);
-
-				empls.Add(new EmployeeViewProc { Code = code, Name = name, BirthDate = birthdate, Address = address, PhoneNumber = phonenum, Email = email, DepartmentID = depid, PositionID = posiid, SkillID = skillid, DateStart = datestart, Gender = gender, ProjectName = projectname, ProjectStart = projectstart, ProjectEnd = projectend, MoneyBonus = moneybonus, SalaryAmount = salaryamount });
+					empls.Add(new EmployeeViewProc
+					{
+						ID = id,
+						Code = code,
+						Name = name,
+						BirthDate = birthdate,
+						Address = address,
+						PhoneNumber = phonenum,
+						Email = email,
+						DepartmentID = depid,
+						PositionID = posiid,
+						SkillID = skillid,
+						DateStart = datestart,
+						Gender = gender,
+						SalaryAmount = salaryamount
+					});
+				}
 				return empls;
 			}
 
